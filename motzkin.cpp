@@ -245,13 +245,13 @@ MotzkinPath MotzkinPath::succ1(){
 
 
 // returns -1 if succ0 does not exist
-void Motzkin::printSets(BigInt pathNum){
+void Motzkin::printSets(mpz_class pathNum){
 	numberToMotzkinPath(pathNum).printSets();
 }
-BigInt Motzkin::motzkinPathsNumber(){
+mpz_class Motzkin::motzkinPathsNumber(){
 	return pathsNumber[0][0];
 }
-BigInt Motzkin::succ0(BigInt pathNum){
+mpz_class Motzkin::succ0(mpz_class pathNum){
 	MotzkinPath temp=numberToMotzkinPath(pathNum);
 	MotzkinPath succ(length);
 	try{
@@ -263,15 +263,15 @@ BigInt Motzkin::succ0(BigInt pathNum){
 	return motzkinPathToNumber(succ);
 }
 
-BigInt Motzkin::succ1(BigInt pathNum){
+mpz_class Motzkin::succ1(mpz_class pathNum){
 	MotzkinPath temp=numberToMotzkinPath(pathNum);
 	MotzkinPath succ=temp.succ1();
 	return motzkinPathToNumber(succ);
 }
 
-BigInt Motzkin::sumNeighbors(int i, int j){
+mpz_class Motzkin::sumNeighbors(int i, int j){
 	/* for each cell, sum up the three right neighbors (if exist) */
-	BigInt sum=0;	
+	mpz_class sum=0;	
 
 	if (j>=length) return 0; // no right neighbors
 	if (i>0) sum+=pathsNumber[i-1][j+1]; // a lower neighbor exists
@@ -284,9 +284,9 @@ Motzkin::Motzkin(int n):length(n), maxHeight(n/2){
 	int i,j;
 
 	/* initalizing the array */
-	pathsNumber=new BigInt*[maxHeight+1];
+	pathsNumber=new mpz_class*[maxHeight+1];
 	for (i=0; i<=maxHeight; i++){
-		pathsNumber[i]=new BigInt[n+1];
+		pathsNumber[i]=new mpz_class[n+1];
 		for (j=0; j<=n; j++)
 			pathsNumber[i][j]=0; //initialize everything to 0;
 	}
@@ -309,7 +309,7 @@ void Motzkin::print(int width){
 	}
 			
 }
-MotzkinPath Motzkin::numberToMotzkinPath(BigInt number){
+MotzkinPath Motzkin::numberToMotzkinPath(mpz_class number){
 	MotzkinPath temp(length);
 	int i=0; // initial height
 	if (number>=pathsNumber[0][0]) throw ErrorNotMotzkinPathNumber();
@@ -336,8 +336,8 @@ MotzkinPath Motzkin::numberToMotzkinPath(BigInt number){
 	return temp;
 }
 
-BigInt Motzkin::motzkinPathToNumber(MotzkinPath path){
-	BigInt num=0;
+mpz_class Motzkin::motzkinPathToNumber(MotzkinPath path){
+	mpz_class num=0;
 	int i=0;
 	if (path.length!=length) throw MotzkinPathLengthDoNotMatch();
 	for (int j=0; j<length; j++){
@@ -358,26 +358,26 @@ BigInt Motzkin::motzkinPathToNumber(MotzkinPath path){
 	return num;
 }
 
-BigInt defaultVector(BigInt cellNum){
+mpz_class defaultVector(mpz_class cellNum){
 	return 1;
 }
 
-BigInt computeVectorCell(int n, BigInt cellNum, Motzkin& motzkinInfo){ // n- iteration number
+mpz_class computeVectorCell(int n, mpz_class cellNum, Motzkin& motzkinInfo){ // n- iteration number
 	if (n==1) return defaultVector(cellNum);
 	
-	BigInt returnValue;
+	mpz_class returnValue;
 	returnValue=computeVectorCell(n-1,motzkinInfo.succ1(cellNum),motzkinInfo);
 	if (motzkinInfo.succ0(cellNum)!=-1)
 		returnValue+=computeVectorCell(n,motzkinInfo.succ0(cellNum),motzkinInfo);
 	return returnValue;
 }
 
-bool vectorCellValueWorthSaving(int n, BigInt cellNum){
+bool vectorCellValueWorthSaving(int n, mpz_class cellNum){
 	
 	return false;
 }
 
-BigInt computeVectorCellExtended(int n, BigInt cellNum, Motzkin& motzkinInfo, VectorKnownValueMap& knownValues){ // n- iteration number
+mpz_class computeVectorCellExtended(int n, mpz_class cellNum, Motzkin& motzkinInfo, VectorKnownValueMap& knownValues){ // n- iteration number
 	if (n==1) return defaultVector(cellNum);
 	
 	VectorKnownValueMap::iterator iter;
@@ -385,7 +385,7 @@ BigInt computeVectorCellExtended(int n, BigInt cellNum, Motzkin& motzkinInfo, Ve
 	if (iter != knownValues.end())
 		return iter->second;
 		
-	BigInt returnValue;
+	mpz_class returnValue;
 	returnValue=computeVectorCellExtended(n-1,motzkinInfo.succ1(cellNum),motzkinInfo,knownValues);
 	if (motzkinInfo.succ0(cellNum)!=-1)
 		returnValue+=computeVectorCellExtended(n,motzkinInfo.succ0(cellNum),motzkinInfo,knownValues);
@@ -395,21 +395,21 @@ BigInt computeVectorCellExtended(int n, BigInt cellNum, Motzkin& motzkinInfo, Ve
 }
 
 void IterationVector::init(VectorValueType initValue){
-	for (BigInt i=0; i<size; i++)
+	for (mpz_class i=0; i<size; i++)
 		cell[i]=initValue;
 }
 
 void IterationVector::iterate(Motzkin& motzkinInfo){
 	IterationVector temp(this->size);
 	temp.init(0);
-	for (BigInt i=0; i<size; i++){
+	for (mpz_class i=0; i<size; i++){
 		if (motzkinInfo.succ0(i)!=-1)
 			temp.cell[i]+=temp.cell[motzkinInfo.succ0(i)];
 		temp.cell[i]+=cell[motzkinInfo.succ1(i)];
 	}
 	*this=temp;
 }
-void IterationVector::printSpecificCell(BigInt cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
+void IterationVector::printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
 	cout << "Cell number "<<cellToPrint<<endl;
 	init(1);
 	for (int i=2; i<=maximumIteration; i++) {
@@ -418,7 +418,7 @@ void IterationVector::printSpecificCell(BigInt cellToPrint, int maximumIteration
 	}
 }
 
-void IterationVector::printGrowthConstant(BigInt cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
+void IterationVector::printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
 	cout << "Cell number "<<cellToPrint<<endl;
 	init(1);
 	for (int i=2; i<=maximumIteration; i++) {
@@ -428,7 +428,7 @@ void IterationVector::printGrowthConstant(BigInt cellToPrint, int maximumIterati
 }
 /*
 void IterationVector::print(){
-	for (BigInt i=0; i<size; i+=4){
+	for (mpz_class i=0; i<size; i+=4){
 		for (int j=0; j<4 && j+i<size; j++){
 			cout.width(4);
 			cout << i+j<<":";
@@ -440,7 +440,7 @@ void IterationVector::print(){
 }
 */
 void IterationVector::print(){
-	for (BigInt i=0; i<size; i+=1){
+	for (mpz_class i=0; i<size; i+=1){
 			cout << i<<":"<<cell[i]<<" "<<endl;
 	}
 }
@@ -448,7 +448,7 @@ void IterationVector::print(){
 // void readKnownValues(VectorKnownValueMap& knownValues, char* filename){
 // 	fstream file(filename);
 // 	string a,b;
-// 	BigInt 
+// 	mpz_class 
 // }
 
 int main(){
@@ -466,7 +466,7 @@ int main(){
 //	cout << computeVectorCell(15,20,test)<<endl;
 //	test.print();
 /*
-	for (BigInt i=1; i<test.motzkinPathsNumber(); i++){
+	for (mpz_class i=1; i<test.motzkinPathsNumber(); i++){
 		cout.width(2);
 		cout << i<<": ";
 //		test.printSets(i);

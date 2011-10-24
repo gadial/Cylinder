@@ -3,7 +3,9 @@
 #include <map>
 #include <fstream>
 #include <string>
-#include "bigint.h"
+#include <gmpxx.h> //The GNU Multiple Precision Arithmetic Library; see http://gmplib.org/
+
+// #include "bigint.h"
 using namespace std;
 class ErrorType{
 };
@@ -17,9 +19,8 @@ class succ0ReturnNull:public ErrorType{};
 class succ0Fail:public ErrorType{};
 class succ1Fail:public ErrorType{};
 
-//typedef int BigInt;
-typedef pair<int,BigInt> KnownValuesMapCoordinates; //first index is iteration number, second is place in vector
-typedef map<KnownValuesMapCoordinates,BigInt> VectorKnownValueMap; 
+typedef pair<int,mpz_class> KnownValuesMapCoordinates; //first index is iteration number, second is place in vector
+typedef map<KnownValuesMapCoordinates,mpz_class> VectorKnownValueMap; 
 // a Motzkin path (of length n) is a path from (0,0) to (0,n) which is always above the x-axis
 // and contains exactly n steps. Each step is "go right" which can be combined with "go up" or
 // "go down". Henceforth, we represent it as a size n array of 1 ("up"), 0 ("stay") and -1 ("down")
@@ -64,30 +65,30 @@ class MotzkinPath{
 class Motzkin{
 	public:
 	Motzkin(int n);
-	BigInt sumNeighbors(int i, int j);
-	MotzkinPath numberToMotzkinPath(BigInt number);
-	BigInt motzkinPathToNumber(MotzkinPath path);
+	mpz_class sumNeighbors(int i, int j);
+	MotzkinPath numberToMotzkinPath(mpz_class number);
+	mpz_class motzkinPathToNumber(MotzkinPath path);
 	void print(int width=5);
-	BigInt succ0(BigInt pathNum);
-	BigInt succ1(BigInt pathNum);
-	BigInt motzkinPathsNumber();
-	void printSets(BigInt pathNum);
+	mpz_class succ0(mpz_class pathNum);
+	mpz_class succ1(mpz_class pathNum);
+	mpz_class motzkinPathsNumber();
+	void printSets(mpz_class pathNum);
 	int length;
 	int maxHeight;
-	BigInt** pathsNumber;
+	mpz_class** pathsNumber;
 };
 
 class IterationVector{
-	typedef BigInt VectorValueType;
+	typedef mpz_class VectorValueType;
 	public:
-		IterationVector(BigInt _size):size(_size){};
+		IterationVector(mpz_class _size):size(_size){};
 		void init(VectorValueType initValue=1);
 		void iterate(Motzkin& motzkinInfo);
 		void print();
-		void printSpecificCell(BigInt cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
-		void printGrowthConstant(BigInt cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
+		void printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
+		void printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
 	private:
-		BigInt size;
-		map<BigInt, VectorValueType> cell;
+		mpz_class size;
+		map<mpz_class, VectorValueType> cell;
 		
 };

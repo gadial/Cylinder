@@ -1,7 +1,7 @@
 CC = g++
 EXEC = cylinder
 OBJS = motzkin.o
-LINK_FLAG = # empty
+LINK_FLAG = -lgmpxx -lgmp
 COMP_FLAG = -Wall -Werror
 
 $(EXEC) : $(OBJS)
