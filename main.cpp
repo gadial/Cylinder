@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include "motzkin.h"
 
-void printGrowthConstant(Motzkin& motzkinInfo, int precision = 15, int maximumIteration = -1){
+mpf_class printGrowthConstant(Motzkin& motzkinInfo, int precision = 15, int maximumIteration = -1){
 	cout << setprecision(precision);
-	
+	int i = 1;
 	IterationVector old_vector(motzkinInfo, precision);
-	for (int i=2; (maximumIteration < 0) || i<=maximumIteration; i++) {
+	while (1){
+		i++;
 		IterationVector new_vector = old_vector.iterate();
 		mpf_class temp(new_vector.cell_value(1) / old_vector.cell_value(1), precision);
  		mpf_class min = temp;
@@ -20,9 +21,9 @@ void printGrowthConstant(Motzkin& motzkinInfo, int precision = 15, int maximumIt
 				max = temp;
 			}
 		}
-		cout << "n="<<i<<": min = "<< min <<", max = " << max <<endl;
-		if (mpf_eq(min.get_mpf_t(), max.get_mpf_t(), temp.get_prec()))
-			break;
+// 		cout << "n="<<i<<endl<<"min = "<< min << endl << "max = " << max <<endl;
+		if (mpf_eq(min.get_mpf_t(), max.get_mpf_t(), temp.get_prec()) || (maximumIteration > 0 && i > maximumIteration))
+			return min;
 		old_vector = new_vector;
 	}
 }
@@ -45,6 +46,6 @@ int main(int argc, char* argv[]){
 	
 
 	Motzkin motzkinInfo(W+1);
-	printGrowthConstant(motzkinInfo,precision,maximumIteration);
+	cout << setprecision(precision) << printGrowthConstant(motzkinInfo,precision,maximumIteration) << endl;
 	return 0;
 }
