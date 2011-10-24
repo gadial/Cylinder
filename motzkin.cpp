@@ -404,9 +404,12 @@ mpz_class computeVectorCellExtended(int n, mpz_class cellNum, Motzkin& motzkinIn
 	return returnValue;
 }
 
-void IterationVector::init(VectorValueType initValue){
-	for (mpz_class i=0; i<size; i++)
+void IterationVector::init(VectorValueType initValue, int precision){
+	for (mpz_class i=0; i<size; i++){
 		cell[i]=initValue;
+		if (precision > 0)
+			cell[i].set_prec(precision);
+	}
 }
 
 IterationVector& IterationVector::operator=(const IterationVector& rhs){
@@ -426,44 +429,4 @@ IterationVector IterationVector::iterate(){
 	}
 	return temp;
 }
-// void IterationVector::printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
-// 	cout << "Cell number "<<cellToPrint<<endl;
-// 	init(1);
-// 	for (int i=2; i<=maximumIteration; i++) {
-// 		iterate(motzkinInfo);
-// 		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
-// 	}
-// }
 
-// void IterationVector::printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
-// 	cout << "Cell number "<<cellToPrint<<endl;
-// 	init(1);
-// 	for (int i=2; i<=maximumIteration; i++) {
-// 		iterate(motzkinInfo);
-// 		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
-// 	}
-// }
-/*
-void IterationVector::print(){
-	for (mpz_class i=0; i<size; i+=4){
-		for (int j=0; j<4 && j+i<size; j++){
-			cout.width(4);
-			cout << i+j<<":";
-			cout.width(6);
-			cout<<cell[i+j]<<" ";
-		}
-		cout << endl;			
-	}
-}
-*/
-// void IterationVector::print(){
-// 	for (mpz_class i=0; i<size; i+=1){
-// 			cout << i<<":"<<cell[i]<<" "<<endl;
-// 	}
-// }
-
-// void readKnownValues(VectorKnownValueMap& knownValues, char* filename){
-// 	fstream file(filename);
-// 	string a,b;
-// 	mpz_class 
-// }

@@ -81,16 +81,15 @@ class Motzkin{
 };
 
 class IterationVector{
-	typedef mpz_class VectorValueType;
+	typedef mpf_class VectorValueType;
 	public:
-		IterationVector(Motzkin& _motzkinInfo):size(_motzkinInfo.motzkinPathsNumber()),motzkinInfo(_motzkinInfo){init();};
+		IterationVector(Motzkin& _motzkinInfo, int precision = -1):size(_motzkinInfo.motzkinPathsNumber()),motzkinInfo(_motzkinInfo){init(1, precision);};
 		IterationVector(const IterationVector& rhs):size(rhs.size),cell(rhs.cell),motzkinInfo(rhs.motzkinInfo){};
 		IterationVector& operator=(const IterationVector&);
-		void init(VectorValueType initValue=1);
+		void init(VectorValueType initValue=1, int precision = -1);
 		IterationVector iterate();
-		mpz_class cell_value(mpz_class i){return cell[i];};
-/*		void printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
-		void printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);*/
+		VectorValueType cell_value(mpz_class i){return cell[i];};
+		mpz_class get_size(){return size;};
 	private:
 		mpz_class size;
 		map<mpz_class, VectorValueType> cell;
