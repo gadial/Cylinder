@@ -65,6 +65,7 @@ class MotzkinPath{
 class Motzkin{
 	public:
 	Motzkin(int n);
+	Motzkin(const Motzkin&);
 	mpz_class sumNeighbors(int i, int j);
 	MotzkinPath numberToMotzkinPath(mpz_class number);
 	mpz_class motzkinPathToNumber(MotzkinPath path);
@@ -73,6 +74,7 @@ class Motzkin{
 	mpz_class succ1(mpz_class pathNum);
 	mpz_class motzkinPathsNumber();
 	void printSets(mpz_class pathNum);
+	private:
 	int length;
 	int maxHeight;
 	mpz_class** pathsNumber;
@@ -81,14 +83,16 @@ class Motzkin{
 class IterationVector{
 	typedef mpz_class VectorValueType;
 	public:
-		IterationVector(mpz_class _size):size(_size){};
+		IterationVector(Motzkin& _motzkinInfo):size(_motzkinInfo.motzkinPathsNumber()),motzkinInfo(_motzkinInfo){init();};
+		IterationVector(const IterationVector& rhs):size(rhs.size),cell(rhs.cell),motzkinInfo(rhs.motzkinInfo){};
+		IterationVector& operator=(const IterationVector&);
 		void init(VectorValueType initValue=1);
-		void iterate(Motzkin& motzkinInfo);
-		void print();
-		void printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
-		void printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
+		IterationVector iterate();
+		mpz_class cell_value(mpz_class i){return cell[i];};
+/*		void printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);
+		void printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo);*/
 	private:
 		mpz_class size;
 		map<mpz_class, VectorValueType> cell;
-		
+		Motzkin motzkinInfo;		
 };

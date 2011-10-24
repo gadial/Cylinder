@@ -245,6 +245,34 @@ MotzkinPath MotzkinPath::succ1(){
 
 
 // returns -1 if succ0 does not exist
+Motzkin::Motzkin(int n):length(n), maxHeight(n/2){
+	int i,j;
+
+	/* initalizing the array */
+	pathsNumber=new mpz_class*[maxHeight+1];
+	for (i=0; i<=maxHeight; i++){
+		pathsNumber[i]=new mpz_class[n+1];
+		for (j=0; j<=n; j++)
+			pathsNumber[i][j]=0; //initialize everything to 0;
+	}
+	/* initial condition: 1 for the the rightmost down corner */
+	pathsNumber[0][n]=1; 
+	/* now continue by induction */
+	for (j=n-1; j>=0; j--)
+		for (i=0; i<=maxHeight; i++)
+			pathsNumber[i][j]=sumNeighbors(i,j);
+}
+
+Motzkin::Motzkin(const Motzkin& rhs):length(rhs.length), maxHeight(rhs.maxHeight){
+	int i,j;
+	pathsNumber=new mpz_class*[maxHeight+1];
+	for (i=0; i<=maxHeight; i++){
+		pathsNumber[i]=new mpz_class[length+1];
+		for (j=0; j<=length; j++)
+			pathsNumber[i][j]=rhs.pathsNumber[i][j]; 
+	}
+}
+
 void Motzkin::printSets(mpz_class pathNum){
 	numberToMotzkinPath(pathNum).printSets();
 }
@@ -278,24 +306,6 @@ mpz_class Motzkin::sumNeighbors(int i, int j){
 	if (i<maxHeight) sum+=pathsNumber[i+1][j+1]; // an upper neighbor exists
 	sum+=pathsNumber[i][j+1]; // frontal neighbor always exists if j<length
 	return sum;	
-}
-
-Motzkin::Motzkin(int n):length(n), maxHeight(n/2){
-	int i,j;
-
-	/* initalizing the array */
-	pathsNumber=new mpz_class*[maxHeight+1];
-	for (i=0; i<=maxHeight; i++){
-		pathsNumber[i]=new mpz_class[n+1];
-		for (j=0; j<=n; j++)
-			pathsNumber[i][j]=0; //initialize everything to 0;
-	}
-	/* initial condition: 1 for the the rightmost down corner */
-	pathsNumber[0][n]=1; 
-	/* now continue by induction */
-	for (j=n-1; j>=0; j--)
-		for (i=0; i<=maxHeight; i++)
-			pathsNumber[i][j]=sumNeighbors(i,j);
 }
 
 void Motzkin::print(int width){
@@ -399,33 +409,40 @@ void IterationVector::init(VectorValueType initValue){
 		cell[i]=initValue;
 }
 
-void IterationVector::iterate(Motzkin& motzkinInfo){
-	IterationVector temp(this->size);
+IterationVector& IterationVector::operator=(const IterationVector& rhs){
+	size = rhs.size;
+	cell = rhs.cell;
+	motzkinInfo = rhs.motzkinInfo;
+	return *this;
+}
+
+IterationVector IterationVector::iterate(){
+	IterationVector temp(motzkinInfo);
 	temp.init(0);
 	for (mpz_class i=0; i<size; i++){
 		if (motzkinInfo.succ0(i)!=-1)
 			temp.cell[i]+=temp.cell[motzkinInfo.succ0(i)];
 		temp.cell[i]+=cell[motzkinInfo.succ1(i)];
 	}
-	*this=temp;
+	return temp;
 }
-void IterationVector::printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
-	cout << "Cell number "<<cellToPrint<<endl;
-	init(1);
-	for (int i=2; i<=maximumIteration; i++) {
-		iterate(motzkinInfo);
-		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
-	}
-}
+// void IterationVector::printSpecificCell(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
+// 	cout << "Cell number "<<cellToPrint<<endl;
+// 	init(1);
+// 	for (int i=2; i<=maximumIteration; i++) {
+// 		iterate(motzkinInfo);
+// 		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
+// 	}
+// }
 
-void IterationVector::printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
-	cout << "Cell number "<<cellToPrint<<endl;
-	init(1);
-	for (int i=2; i<=maximumIteration; i++) {
-		iterate(motzkinInfo);
-		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
-	}
-}
+// void IterationVector::printGrowthConstant(mpz_class cellToPrint, int maximumIteration, Motzkin& motzkinInfo){
+// 	cout << "Cell number "<<cellToPrint<<endl;
+// 	init(1);
+// 	for (int i=2; i<=maximumIteration; i++) {
+// 		iterate(motzkinInfo);
+// 		cout << "n="<<i<<": "<<cell[cellToPrint]<<endl;
+// 	}
+// }
 /*
 void IterationVector::print(){
 	for (mpz_class i=0; i<size; i+=4){
@@ -439,11 +456,11 @@ void IterationVector::print(){
 	}
 }
 */
-void IterationVector::print(){
-	for (mpz_class i=0; i<size; i+=1){
-			cout << i<<":"<<cell[i]<<" "<<endl;
-	}
-}
+// void IterationVector::print(){
+// 	for (mpz_class i=0; i<size; i+=1){
+// 			cout << i<<":"<<cell[i]<<" "<<endl;
+// 	}
+// }
 
 // void readKnownValues(VectorKnownValueMap& knownValues, char* filename){
 // 	fstream file(filename);
