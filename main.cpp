@@ -29,6 +29,10 @@ mpf_class printGrowthConstant(Motzkin& motzkinInfo, int precision = 15, int maxi
 }
 
 int main(int argc, char* argv[]){
+	if (argc == 2 && strcmp(argv[1],"--v") == 0){
+		cout << "GMP version: " << gmp_version << endl;
+		exit(1);
+	}
 	if (argc < 2){
 		exit(1);
 	}
